@@ -60,57 +60,7 @@ auto HidDevice::ScanForDevice(uint16_t vendor, uint16_t product) -> HidDevice
         
         hid_free_enumeration(hidenum);
     }
-    /*std::vector<uint8_t> buffer;
-    GUID guid;
-
-    HidD_GetHidGuid(&guid);
-
-    HDEVINFO hDevInfo = SetupDiGetClassDevsW(&guid, nullptr, nullptr, DIGCF_DEVICEINTERFACE | DIGCF_PRESENT);
-    if(hDevInfo != INVALID_HANDLE_VALUE)
-    {
-        for(uint32_t i = 0; !output; ++i)
-        {
-            DWORD required_size;
-            SP_DEVICE_INTERFACE_DATA data;
-            data.cbSize = sizeof(data);
-
-            if(!SetupDiEnumDeviceInterfaces(hDevInfo, nullptr, &guid, i, &data))
-                break;
-
-            if(!SetupDiGetDeviceInterfaceDetailW(hDevInfo, &data, nullptr, 0, &required_size, nullptr)
-                && GetLastError() == ERROR_INSUFFICIENT_BUFFER)
-            {
-                if(buffer.size() < required_size)
-                    buffer.resize(required_size);
-
-                auto& detail = *reinterpret_cast<SP_DEVICE_INTERFACE_DETAIL_DATA_W*>(buffer.data());
-                detail.cbSize = sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA_W);
-
-                if(SetupDiGetDeviceInterfaceDetailW(hDevInfo, &data, &detail, buffer.size(), nullptr, nullptr))
-                {
-                    HANDLE hDev = CreateFileW(detail.DevicePath, 0, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, 0);
-                    if(hDev != INVALID_HANDLE_VALUE)
-                    {
-                        HIDD_ATTRIBUTES attrs;
-                        attrs.Size = sizeof(attrs);
-
-                        if(HidD_GetAttributes(hDev, &attrs))
-                        {
-                            if(attrs.VendorID == vendor && attrs.ProductID == product)
-                            {
-                                output = HidDevice(detail.DevicePath, attrs.VendorID, attrs.ProductID);
-                            }
-                        }
-
-                        CloseHandle(hDev);
-                    }
-                }
-            }
-        }
-
-        SetupDiDestroyDeviceInfoList(hDevInfo);
-    }*/
-
+    
     return output;
 }
 
