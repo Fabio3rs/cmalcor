@@ -89,4 +89,15 @@ public:
             hDev(hDev), hLock(hLock)
         {}
     };
+    
+    // Singleton for hid library
+	class HidLibSingle
+	{
+	
+		HidLibSingle();
+	
+	public:
+		static HidLibSingle &hidlib();
+		~HidLibSingle();
+	};
 };

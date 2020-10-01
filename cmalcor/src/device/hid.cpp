@@ -2,6 +2,22 @@
 #include "hid.hpp"
 #include <vector>
 
+HidDevice::HidLibSingle::HidLibSingle()
+{
+	hid_init();
+}
+
+HidDevice::HidLibSingle::~HidLibSingle()
+{
+	hid_exit();
+}
+
+HidDevice::HidLibSingle &HidDevice::HidLibSingle::hidlib()
+{
+	static HidLibSingle single;
+	return single;
+}
+
 auto HidDevice::Open() const -> IoHandle
 {
     //static_assert(std::is_same<::HANDLE, IoHandle::HANDLE>::value, "");
@@ -33,13 +49,14 @@ auto HidDevice::Open() const -> IoHandle
 
 auto HidDevice::ScanForDevice(uint16_t vendor, uint16_t product) -> HidDevice
 {
-    hid_init();
+    HidLibSingle::hidlib();
     HidDevice output;
     hid_device_info *hidenum = hid_enumerate(vendor, product);
     
     if (hidenum != nullptr)
     {
         output = HidDevice(hidenum->path == nullptr? "" : hidenum->path, hidenum->vendor_id, hidenum->product_id);
+        printf("Devices %s 0x%x 0x%x\n", hidenum->path, hidenum->vendor_id, hidenum->product_id);
         
         hid_free_enumeration(hidenum);
     }
