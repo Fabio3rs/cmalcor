@@ -5,7 +5,7 @@
 auto HidDevice::Open() const -> IoHandle
 {
     //static_assert(std::is_same<::HANDLE, IoHandle::HANDLE>::value, "");
-    assert(0);
+    
     if(*this)
     {
         /*wchar_t lockpath[MAX_PATH];
@@ -24,13 +24,25 @@ auto HidDevice::Open() const -> IoHandle
                 }
             }
         }*/
+        
+        hid_device *hDev = hid_open_path(this->device.c_str());
+        return IoHandle(hDev, 0/*hLock*/);
     }
     return IoHandle();
 }
 
 auto HidDevice::ScanForDevice(uint16_t vendor, uint16_t product) -> HidDevice
 {
+    hid_init();
     HidDevice output;
+    hid_device_info *hidenum = hid_enumerate(vendor, product);
+    
+    if (hidenum != nullptr)
+    {
+        output = HidDevice(hidenum->path == nullptr? "" : hidenum->path, hidenum->vendor_id, hidenum->product_id);
+        
+        hid_free_enumeration(hidenum);
+    }
     /*std::vector<uint8_t> buffer;
     GUID guid;
 
@@ -89,6 +101,7 @@ HidDevice::IoHandle::~IoHandle()
 {
     if(*this)
     {
+        hid_close(hDev);
         //CloseHandle(hDev);
 
         if(hLock != 0 && hLock != nullptr)
@@ -100,15 +113,15 @@ HidDevice::IoHandle::~IoHandle()
 
 HidDevice::IoHandle::operator bool() const
 {
-    return (hDev != 0 && hDev != nullptr);
+    return (hDev != nullptr);
 }
 
 bool HidDevice::IoHandle::GetFeature(void* buffer, size_t size) const
 {
-    return false;//!!HidD_GetFeature(hDev, buffer, size);
+    return hid_get_feature_report(hDev, reinterpret_cast<uint8_t*>(buffer), size) != -1;
 }
 
 bool HidDevice::IoHandle::SetFeature(const void* buffer, size_t size) const
 {
-    return false;//!!HidD_SetFeature(hDev, (PVOID)(buffer), size);
+    return hid_send_feature_report(hDev, reinterpret_cast<const uint8_t*>(buffer), size) != -1;
 }
