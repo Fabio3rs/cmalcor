@@ -1,18 +1,14 @@
 #define WIN32_LEAN_AND_MEAN
 #include "hid.hpp"
 #include <vector>
-#include <windows.h>
-#include <hidsdi.h>
-#include <setupapi.h>
-#include <shlobj.h>
 
 auto HidDevice::Open() const -> IoHandle
 {
-    static_assert(std::is_same<::HANDLE, IoHandle::HANDLE>::value, "");
-
+    //static_assert(std::is_same<::HANDLE, IoHandle::HANDLE>::value, "");
+    assert(0);
     if(*this)
     {
-        wchar_t lockpath[MAX_PATH];
+        /*wchar_t lockpath[MAX_PATH];
         wchar_t devid[64];
 
         if(SUCCEEDED(SHGetFolderPathW(nullptr, CSIDL_COMMON_APPDATA | CSIDL_FLAG_CREATE, NULL, SHGFP_TYPE_DEFAULT, lockpath)))
@@ -20,14 +16,14 @@ auto HidDevice::Open() const -> IoHandle
             if(swprintf(devid, std::size(devid), L"/device_hid_%X_%X.lock", vendor, product) > 0
                 && wcscat_s(lockpath, std::size(lockpath), devid) == 0)
             {
-                HANDLE hLock = CreateFileW(lockpath, GENERIC_READ | GENERIC_WRITE, 0 /*noshare*/, nullptr, OPEN_ALWAYS, FILE_FLAG_DELETE_ON_CLOSE, nullptr);
+                HANDLE hLock = CreateFileW(lockpath, GENERIC_READ | GENERIC_WRITE, 0 /*noshare*//*, nullptr, OPEN_ALWAYS, FILE_FLAG_DELETE_ON_CLOSE, nullptr);
                 if(hLock != INVALID_HANDLE_VALUE)
                 {
                     HANDLE hDev = CreateFileW(this->device.c_str(), 0, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, 0, 0);
                     return IoHandle(hDev, hLock);
                 }
             }
-        }
+        }*/
     }
     return IoHandle();
 }
@@ -35,7 +31,7 @@ auto HidDevice::Open() const -> IoHandle
 auto HidDevice::ScanForDevice(uint16_t vendor, uint16_t product) -> HidDevice
 {
     HidDevice output;
-    std::vector<uint8_t> buffer;
+    /*std::vector<uint8_t> buffer;
     GUID guid;
 
     HidD_GetHidGuid(&guid);
@@ -84,7 +80,7 @@ auto HidDevice::ScanForDevice(uint16_t vendor, uint16_t product) -> HidDevice
         }
 
         SetupDiDestroyDeviceInfoList(hDevInfo);
-    }
+    }*/
 
     return output;
 }
@@ -93,26 +89,26 @@ HidDevice::IoHandle::~IoHandle()
 {
     if(*this)
     {
-        CloseHandle(hDev);
+        //CloseHandle(hDev);
 
-        if(hLock != 0 && hLock != INVALID_HANDLE_VALUE)
+        if(hLock != 0 && hLock != nullptr)
         {
-            CloseHandle(hLock);
+            //CloseHandle(hLock);
         }
     }
 }
 
 HidDevice::IoHandle::operator bool() const
 {
-    return (hDev != 0 && hDev != INVALID_HANDLE_VALUE);
+    return (hDev != 0 && hDev != nullptr);
 }
 
 bool HidDevice::IoHandle::GetFeature(void* buffer, size_t size) const
 {
-    return !!HidD_GetFeature(hDev, buffer, size);
+    return false;//!!HidD_GetFeature(hDev, buffer, size);
 }
 
 bool HidDevice::IoHandle::SetFeature(const void* buffer, size_t size) const
 {
-    return !!HidD_SetFeature(hDev, (PVOID)(buffer), size);
+    return false;//!!HidD_SetFeature(hDev, (PVOID)(buffer), size);
 }
