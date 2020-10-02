@@ -80,7 +80,11 @@ public:
 
     protected:
         friend class HidDevice;
+        #ifdef _WIN32
         using HANDLE = void*;
+        #else
+        using HANDLE = int;
+        #endif
 
         hid_device *hDev;
         HANDLE hLock;
