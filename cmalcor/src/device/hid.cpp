@@ -56,7 +56,6 @@ auto HidDevice::ScanForDevice(uint16_t vendor, uint16_t product) -> HidDevice
     if (hidenum != nullptr)
     {
         output = HidDevice(hidenum->path == nullptr? "" : hidenum->path, hidenum->vendor_id, hidenum->product_id);
-        printf("Devices %s 0x%x 0x%x\n", hidenum->path, hidenum->vendor_id, hidenum->product_id);
         
         hid_free_enumeration(hidenum);
     }
