@@ -5,11 +5,13 @@
 #include <cstring>
 
 #ifdef _WIN32
-
+#include <Windows.h>
+#include <SetupAPI.h>
+#include <ShlObj.h>
 #else
 #include <sys/file.h> // flock(2)
 #include <unistd.h> // close(2)
-constexpr int INVALID_HANDLE_VALUE = 0;
+constexpr int INVALID_HANDLE_VALUE = -1;
 #endif
 
 HidDevice::HidLibSingle::HidLibSingle()
